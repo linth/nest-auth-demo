@@ -11,20 +11,19 @@ import { Strategy, ExtractJwt } from "passport-jwt";
  * 然後返回一個自定義的類，該類可以被繼承。
  */
 
+// jwt strategy 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreElements: false,
-      secretOrKey: process.env.JWT_ACCESS_SECRET,
+      ignoreExpiration: false,
+      secretOrKey: process.env.JWT_SECRET,
     });
   }
 
   async validate(payload: any) {
-    return {
-      id: payload.sub,
-      name: payload.name
-    };
+    // console.log('call validate function by jwt strategy.');
+    return { user: payload.sub, username: payload.username };
   }
 }

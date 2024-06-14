@@ -3,65 +3,63 @@
  * Reference:
  *  - https://www.elvisduru.com/blog/nestjs-jwt-authentication-refresh-token
  */
-
 import { Injectable } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { User } from 'src/users/user.entity';
+import { UserService } from 'src/users/user.service';
 
 
 @Injectable()
 export class AuthService {
+
   constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
+    private readonly userService: UserService,
+    private jwtService : JwtService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<any> {
-    console.log('AuthService');
-    
-    const user = await this.usersService.findOne(username);
-
-    if (user && user.password === password) {
-      const { password, username, ...rest } = user;
-      return rest;
+  async validateUser(username: string, password: string) {
+    const user = await this.userService.findOneWithUserName(username);
+    if (user && (await bcrypt.compare(password, user.password))) {
+      const { password, ...result } = user;
+      return result;
     }
     return null;
   }
 
-  // login with username and password.
-  async login(user: any) {
-    const payload = { name: user.name, sub: user.id };
-    // const [access_token, refresh_token] = await Promise.all([
-    //   this.createAccessToken(payload),
-    //   this.createRefreshToken(payload),
-    // ]);
+  async login(user: User) {
+    console.log('user', user);
     
+    const payload = {
+      username: user.email,
+      sub: {
+        name: user.name,
+      },
+    };
+
+    console.log('payload', payload);
+    console.log('access token', this.jwtService.sign(payload));
+    
+
     return {
-      access_token: await this.createAccessToken(payload),
-      refresh_token: await this.createRefreshToken(payload),
-    }
+      ...user,
+      accessToken: this.jwtService.sign(payload),
+      refreshToken: this.jwtService.sign(payload, { expiresIn: '7d' }),
+    };
   }
 
-  async createAccessToken(user: any) {
-    return this.jwtService.signAsync({
-      name: user.name,
-      sub: user.id,
-    });
-  }
+  async refreshToken(user: User) {
+    console.log('refreshToken');
+    
+    const payload = {
+      username: user.email,
+      sub: {
+        name: user.name,
+      },
+    };
 
-  async createRefreshToken(user: any) {
-    return this.jwtService.signAsync({
-      name: user.name,
-      sub: user.id,
-    }, {  
-      secret: 'JWT_REFRESH_SECRET',
-      expiresIn: '1m'
-    });
+    return {
+      accessToken: this.jwtService.sign(payload),
+    };
   }
-
-  // TODO: need to be implemented.
-  async logout() {}
-  async signUp() {}
-  async updateRefreshToken() {}
-  hashData() {}
 }
