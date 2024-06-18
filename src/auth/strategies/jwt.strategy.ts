@@ -22,6 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
+  // 補充說明: 第一次login就是會進入authservice, 當拿到jwt, 之後的交互都會採用jwtstrategy來進行validate user
   async validate(payload: any) {
     // console.log('call validate function by jwt strategy.');
     return { user: payload.sub, username: payload.username };

@@ -27,6 +27,7 @@ export class AuthService {
     return null;
   }
 
+  // 補充說明: 第一次login就是會進入authservice, 當拿到jwt, 之後的交互都會採用jwtstrategy來進行validate user
   async login(user: User) {
     console.log('user', user);
     
