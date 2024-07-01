@@ -1,3 +1,8 @@
+/**
+ * 
+ * Reference:
+ *  - https://bald3r.wang/2023/07/14/NestJS-%E5%85%A5%E9%97%A8%EF%BC%88%E4%B8%89%EF%BC%89%E7%94%A8%E6%88%B7%E7%99%BB%E5%BD%95%E4%B8%8EJWT/
+ */
 import { 
   BeforeInsert, 
   Column, 
@@ -19,7 +24,10 @@ export class User {
   @Column({ nullable: false, unique: true })
   email: string;
 
-  @Column({ nullable: false })
+  @Column({ 
+    nullable: false,
+    select: false,
+  })
   password: string;
 
   // @OneToMany((type) => Comment, (comment) => comment.user)
