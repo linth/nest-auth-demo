@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { config } from 'ormconfig';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './users/user.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { UserModule } from './users/user.module';
       isGlobal: true,
     }),
     TypeOrmModule.forRoot(config),
+    CacheModule.register({ isGlobal: true }),
     AuthModule,
     UserModule
   ],
