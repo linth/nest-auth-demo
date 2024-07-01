@@ -3,10 +3,13 @@ import {
   Controller, 
   Get, 
   Param, 
-  Post 
+  Post, 
+  UseInterceptors
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/createUserDto';
 import { UserService } from './user.service';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+import { User } from './user.entity';
 
 @Controller('user')
 export class UserController {
@@ -16,8 +19,10 @@ export class UserController {
     // private readonly commentService: CommentService,
   ) {}
 
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(15)
   @Get(':id')
-  findOne(@Param('id') id: number) {
+  findOne(@Param('id') id: number): Promise<User | undefined> {
     return this.userService.findOne(id);
   }
 
