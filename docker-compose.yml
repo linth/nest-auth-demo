@@ -1,21 +1,29 @@
 version: '3'
 services:
   db:
-    container_name: 'postgres-database'
+    container_name: 'pg-database'
     image: postgres
     # restart: always
     volumes:
       - ./data/db:/var/lib/postgresql/data
     ports:
-      - 5432:5432
-
+      - 5438:5432
     environment:
-      - POSTGRES_DB=testDB # database.
-      - POSTGRES_USER=postgres # user.
-      - POSTGRES_PASSWORD=postgres # password.
-
-  adminer:
-    image: adminer
-    restart: always
+      - POSTGRES_DB=nestjscrud # database.
+      - POSTGRES_USER=admin # user.
+      - POSTGRES_PASSWORD=admin # password.
+  # adminer:
+  #   image: adminer
+  #   restart: always
+  #   ports:
+  #     - 8080:8080  
+  redis:
+    image: redis
     ports:
-      - 8080:8080
+      - 6379:6379
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:
+    driver: local
